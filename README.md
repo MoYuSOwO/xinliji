@@ -32,17 +32,17 @@ python3 -m http.server 5174
 
 ```json
 [
-  { "id": "1", "name": "卷一 · 圣贤开导现代人" },
-  { "id": "2", "name": "卷二 · 古人误入今世" }
+  { "id": "a", "name": "aname" },
+  { "id": "b", "name": "bname" }
 ]
 ```
 
 ```md
 ---
-order: 3
+order: 300
 title: "篇名"
-volumeId: "1"
-date: "2026-06-30"
+volumeId: "a"
+date: "1999-01-01"
 source: "自录"
 sourceUrl: "https://example.com/original"
 ---
