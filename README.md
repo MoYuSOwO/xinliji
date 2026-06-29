@@ -52,7 +52,7 @@ sourceUrl: "https://example.com/original"
 
 ## GitHub Pages
 
-仓库推到 GitHub 后，在 Settings → Pages 里把 Source 选为 GitHub Actions。之后每次推送到 `main`，`.github/workflows/pages.yml` 会自动：
+仓库推到 GitHub 后，第一次部署前先在 Settings → Pages 里把 Source 选为 GitHub Actions。之后每次推送到 `main`，`.github/workflows/pages.yml` 会自动：
 
 1. 运行 `npm run build`
 2. 上传静态站点
