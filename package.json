@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "node scripts/build-index.js",
+    "check": "node --check app.js && node scripts/build-index.js --check"
+  }
+}
