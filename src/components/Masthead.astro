@@ -5,7 +5,9 @@ const { totalCount, volumeCount } = Astro.props;
 ---
 
 <header class="masthead" aria-label="新礼记">
-  <img class="seal" src={sealUrl} alt="" aria-hidden="true" />
+  <a class="seal-link" href="/" aria-label="返回新礼记首页">
+    <img class="seal" src={sealUrl} alt="" aria-hidden="true" />
+  </a>
   <div class="masthead-copy">
     <p class="kicker">今事古书 · 旧辞新梗</p>
     <h1>新礼记</h1>
