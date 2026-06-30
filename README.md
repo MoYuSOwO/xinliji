@@ -9,28 +9,37 @@
 ## 运行
 
 ```bash
-npm run build
-python3 -m http.server 5174
+npm install
+npm run dev
 ```
 
-然后打开 `http://localhost:5174/`。如果端口被占用，换成其他空闲端口即可。
+然后打开 Astro 输出的本地地址，通常是 `http://localhost:4321/`。
+
+构建静态站点：
+
+```bash
+npm run build
+npm run preview
+```
 
 ## 新增篇目
 
 1. 在 `articles/` 中新增一篇 `.md` 文件。
 2. 如需新卷，先在 `data/volumes.json` 中补一个卷。
-3. 运行 `npm run build` 自动生成 `generated/articles.json`。
+3. 运行 `npm run build`，Astro 会把 Markdown 烘焙为静态页面。
 4. 每篇正文顶部使用 front matter。
 
-每篇 `.md` 顶部的 front matter 是构建时源数据；浏览器不拿它覆盖页面，只用它后面的正文。`generated/articles.json` 是生成给浏览器读取的目录，不需要手写。GitHub Pages 工作流也会自动生成它。目录默认按卷 id、日期倒序、题名排序，不需要维护手工序号。
+每篇 `.md` 顶部的 front matter 是构建时源数据；正文会在 Astro 构建时渲染成 HTML。目录默认按卷 id、日期倒序、题名排序，不需要维护手工序号。
 
-这里用 Node 只是为了自动扫描 Markdown 生成索引，没有第三方依赖；最终页面仍然是普通静态 HTML/CSS/JS。
+这里用 Astro 做静态构建，最终部署产物仍然是普通静态 HTML/CSS/JS。
 
 ## 目录分工
 
 - `articles/`：手写文章，只放 `.md`。
 - `data/volumes.json`：手写卷目，维护卷 id 和卷名。
-- `generated/articles.json`：自动生成目录，不手写。
+- `src/content.config.ts`：定义 Astro 内容集合，扫描 `articles/`。
+- `src/pages/`：首页与单篇文章静态路由。
+- `styles.css`：全站视觉样式，迁移时保留原外观。
 
 `data/volumes.json` 统一管理卷的 id 和名字。文章里只写 `volumeId`，前端显示时再查出卷名：
 
@@ -78,6 +87,7 @@ skills/xinliji-writing/SKILL.md
 
 仓库推到 GitHub 后，第一次部署前先在 Settings → Pages 里把 Source 选为 GitHub Actions。之后每次推送到 `main`，`.github/workflows/pages.yml` 会自动：
 
-1. 运行 `npm run build`
-2. 上传静态站点
-3. 部署到 GitHub Pages
+1. 运行 `npm ci`
+2. 运行 `npm run build`
+3. 上传 `dist/`
+4. 部署到 GitHub Pages

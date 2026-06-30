@@ -61,7 +61,7 @@ author: "MoYuSOwO"
 
 篇名自然时，可用中文文件名，如 `articles/东坡训稚.md`。中文文件名可用；避免空格和复杂标点。目录默认按卷 id、日期倒序、题名排序，不写手工序号。日期默认用当前日期；用户另有指定则从其指定。作者默认用 `author: "MoYuSOwO"`；用户另有指定则从其指定。
 
-添加或改写文章后，运行 `npm run build` 或 `npm run check`，确保 `generated/articles.json` 与正文一致。
+添加或改写文章后，运行 `npm run build` 或 `npm run check`，确保 Astro 能把 Markdown 正常烘焙为静态页面。
 
 ## 写作流程
 
