@@ -170,7 +170,7 @@ async function selectArticle(slug, options = {}) {
     const parsed = parseDocument(raw);
     els.body.innerHTML = renderMarkdown(parsed.body);
     els.readerCount.textContent = `${readerPositionText(article)} · ${countCjkLikeChars(parsed.body)}字`;
-    document.title = `${article.title} · 新周礼记`;
+    document.title = `${article.title} · 新礼记`;
     if (focusReader) focusReaderPanel();
   } catch (error) {
     els.body.innerHTML = `<div class="empty-state">正文未能载入：${escapeHtml(error.message)}</div>`;
