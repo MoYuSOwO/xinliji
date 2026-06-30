@@ -359,6 +359,16 @@ h1 {
   padding-top: 2px;
 }
 
+.empty-result {
+  margin: 12px 0 0;
+  padding: 14px;
+  color: var(--muted);
+  text-align: center;
+  border: 1px dashed rgba(95, 68, 37, 0.24);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 242, 0.58);
+}
+
 .article-card {
   position: relative;
   display: block;
