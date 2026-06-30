@@ -32,6 +32,7 @@ const { articles, volumes, currentSlug = "" } = Astro.props;
     </label>
   </div>
   <div id="articleList" class="article-list">
+    <p id="emptyResult" class="empty-result" role="status" hidden>未检得相合篇目</p>
     {
       articles.map((article) => (
         <a
@@ -53,5 +54,4 @@ const { articles, volumes, currentSlug = "" } = Astro.props;
       ))
     }
   </div>
-  <p id="emptyResult" class="empty-result" hidden>未检得相合篇目</p>
 </aside>
