@@ -9,6 +9,7 @@ const allVolumes = getVolumes();
 const volumes = allVolumes.filter((volume) => articles.some((article) => article.data.volumeId === volume.id));
 const volumeTotal = allVolumes.length;
 const introArticle = articles.find((article) => article.data.volumeId === 0) || articles[0];
+const randomFallback = articles.find((article) => article.data.volumeId !== 0) || articles[0];
 const recentArticles = [...articles]
   .sort((a, b) => String(b.data.date || "").localeCompare(String(a.data.date || "")) || a.data.title.localeCompare(b.data.title, "zh-Hans"))
   .slice(0, 4);
@@ -46,6 +47,7 @@ const volumeItems = allVolumes.map((volume) => {
         <div class="home-actions" aria-label="首页入口">
           <a class="text-button text-button-primary" href="#catalog">入目录</a>
           {introArticle && <a class="text-button" href={articleUrl(introArticle)}>读序</a>}
+          {randomFallback && <a class="text-button" href={articleUrl(randomFallback)} data-random-article data-random-exclude-volume="0">随便翻</a>}
         </div>
       </div>
 

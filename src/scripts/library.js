@@ -3,7 +3,18 @@ const search = document.querySelector("#searchInput");
 const volumeFilter = document.querySelector("#volumeFilter");
 const resultCount = document.querySelector("#resultCount");
 const volumeShortcuts = Array.from(document.querySelectorAll("[data-volume-shortcut]"));
+const randomLinks = Array.from(document.querySelectorAll("[data-random-article]"));
 let emptyResult = null;
+
+for (const link of randomLinks) {
+  link.addEventListener("click", (event) => {
+    const target = randomArticleUrl(link);
+    if (!target) return;
+
+    event.preventDefault();
+    window.location.assign(target);
+  });
+}
 
 if (cards.length && search && volumeFilter && resultCount) {
   search.addEventListener("input", updateList);
@@ -49,4 +60,18 @@ function ensureEmptyResult() {
   emptyResult.hidden = true;
   emptyResult.textContent = "未检得相合篇目";
   articleList.prepend(emptyResult);
+}
+
+function randomArticleUrl(trigger) {
+  const excludeSlug = trigger.dataset.randomExcludeSlug || "";
+  const excludeVolume = trigger.dataset.randomExcludeVolume || "";
+  const candidates = cards.filter((card) => {
+    if (excludeSlug && card.dataset.slug === excludeSlug) return false;
+    if (excludeVolume && card.dataset.volumeId === excludeVolume) return false;
+    return true;
+  });
+  const pool = candidates.length ? candidates : cards;
+  const card = pool[Math.floor(Math.random() * pool.length)];
+
+  return card?.href || "";
 }

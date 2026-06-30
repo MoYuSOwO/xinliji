@@ -31,6 +31,7 @@ const { Content } = await render(article);
 const volumes = getVolumes().filter((volume) => articles.some((item) => item.data.volumeId === volume.id));
 const volumeTotal = getVolumes().length;
 const charCount = countCjkLikeChars(article.body || "");
+const randomFallback = next || previous || articles.find((item) => item.id !== article.id) || article;
 ---
 
 <BaseLayout title={article.data.title} skipTarget="readerPanel" skipLabel="跳至正文">
@@ -60,6 +61,7 @@ const charCount = countCjkLikeChars(article.body || "");
             )
           }
           <a class="text-button text-button-primary" href="/">回目录</a>
+          <a class="text-button" href={articleUrl(randomFallback)} data-random-article data-random-exclude-slug={article.id}>随便翻</a>
           {
             next ? (
               <a class="text-button" href={articleUrl(next)}>下一篇</a>
