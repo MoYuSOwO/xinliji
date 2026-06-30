@@ -1,55 +1,108 @@
 ---
-import { render } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Library from "../components/Library.astro";
 import Masthead from "../components/Masthead.astro";
-import {
-  articleUrl,
-  countCjkLikeChars,
-  getSortedArticles,
-  getVolumes,
-  readerPositionText,
-  volumeName,
-} from "../lib/articles";
+import { articleUrl, getSortedArticles, getVolumes, volumeName } from "../lib/articles";
 
 const articles = await getSortedArticles();
-const volumes = getVolumes().filter((volume) => articles.some((article) => article.data.volumeId === volume.id));
-const first = articles[0];
-const second = articles[1];
-const { Content } = await render(first);
-const charCount = countCjkLikeChars(first.body || "");
+const allVolumes = getVolumes();
+const volumes = allVolumes.filter((volume) => articles.some((article) => article.data.volumeId === volume.id));
+const volumeTotal = allVolumes.filter((volume) => volume.id > 0).length;
+const introArticle = articles.find((article) => article.data.volumeId === 0) || articles[0];
+const recentArticles = [...articles]
+  .sort((a, b) => String(b.data.date || "").localeCompare(String(a.data.date || "")) || a.data.title.localeCompare(b.data.title, "zh-Hans"))
+  .slice(0, 4);
+
+const volumeDescriptions = new Map([
+  [0, "册首缘起，说明今事何以入古书。"],
+  [1, "情绪、自控、成长、学习、身体与心性。"],
+  [2, "亲子、家庭、婚恋、代际、亲情与人伦。"],
+  [3, "学校、考试、导师、职场、老板与同事。"],
+  [4, "钱财、消费、购物、订阅、贫富与交易。"],
+  [5, "技术、AI、编程、工程、器物、车与工具。"],
+  [6, "网梗、舆论、争议、社会怪象与评论区。"],
+]);
+const volumeItems = allVolumes.map((volume) => {
+  const entries = articles.filter((article) => article.data.volumeId === volume.id);
+  return {
+    ...volume,
+    count: entries.length,
+    description: volumeDescriptions.get(volume.id) || "",
+  };
+});
 ---
 
 <BaseLayout title="新礼记">
-  <Masthead totalCount={articles.length} volumeCount={volumes.length} />
+  <Masthead totalCount={articles.length} volumeCount={volumeTotal} />
 
-  <main id="mainContent" class="layout">
-    <Library articles={articles} volumes={volumes} currentSlug={first.id} />
-
-    <article id="readerPanel" class="reader" tabindex="-1">
-      <div class="reader-inner">
-        <div class="reader-top">
-          <div>
-            <p class="volume">{volumeName(first)}</p>
-            <p class="reader-count">
-              {readerPositionText(0, articles.length)} · {charCount}字
-            </p>
-          </div>
-        </div>
-        <h2>{first.data.title}</h2>
-        <div class="meta-line">
-          {[first.data.date, first.data.author ? `作者：${first.data.author}` : ""].filter(Boolean).join(" · ")}
-        </div>
-        <nav class="reader-actions" aria-label="篇目翻阅">
-          <span class="text-button is-disabled" aria-disabled="true">上一篇</span>
-          <a class="text-button text-button-primary" href={articleUrl(first)}>本篇页</a>
-          {second ? <a class="text-button" href={articleUrl(second)}>下一篇</a> : <span class="text-button is-disabled" aria-disabled="true">下一篇</span>}
-        </nav>
-        <div class="article-body">
-          <Content />
+  <main id="mainContent" class="home-main" tabindex="-1">
+    <section class="home-cover" aria-labelledby="homeCoverTitle">
+      <div class="home-cover-copy">
+        <p class="eyebrow">册首</p>
+        <h2 id="homeCoverTitle">今事入古书</h2>
+        <p>
+          《新礼记》收录网络梗、评论区公案与日常小事，取《世说》一类轻文言笔法，写成人情、机锋与余味并在的小品。
+        </p>
+        <div class="home-actions" aria-label="首页入口">
+          <a class="text-button text-button-primary" href="#catalog">入目录</a>
+          {introArticle && <a class="text-button" href={articleUrl(introArticle)}>读序</a>}
         </div>
       </div>
-    </article>
+
+      <aside class="home-recent" aria-labelledby="recentTitle">
+        <p class="eyebrow">近收</p>
+        <h3 id="recentTitle">新入诸篇</h3>
+        <div class="home-recent-list">
+          {
+            recentArticles.map((article) => (
+              <a class="recent-link" href={articleUrl(article)}>
+                <span>{article.data.title}</span>
+                <small>{volumeName(article)} · {article.data.date}</small>
+              </a>
+            ))
+          }
+        </div>
+      </aside>
+    </section>
+
+    <section class="volume-section" aria-labelledby="volumeTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">卷目</p>
+          <h2 id="volumeTitle">六卷一序</h2>
+        </div>
+        <a class="section-link" href="#catalog">全部篇目</a>
+      </div>
+      <div class="volume-grid">
+        {
+          volumeItems.map((volume) => (
+            volume.count > 0 ? (
+              <a class="volume-card" href="#catalog" data-volume-shortcut={String(volume.id)}>
+                <span class="volume-card-kicker">{volume.name}</span>
+                <span class="volume-card-count">{volume.count} 篇</span>
+                <p>{volume.description}</p>
+              </a>
+            ) : (
+              <div class="volume-card is-empty" aria-disabled="true">
+                <span class="volume-card-kicker">{volume.name}</span>
+                <span class="volume-card-count">待收</span>
+                <p>{volume.description}</p>
+              </div>
+            )
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="catalog" class="catalog-section" aria-labelledby="catalogTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">目录</p>
+          <h2 id="catalogTitle">检索诸篇</h2>
+        </div>
+      </div>
+      <Library articles={articles} volumes={volumes} />
+    </section>
   </main>
 
   <script>

@@ -3,10 +3,18 @@ const search = document.querySelector("#searchInput");
 const volumeFilter = document.querySelector("#volumeFilter");
 const resultCount = document.querySelector("#resultCount");
 const emptyResult = document.querySelector("#emptyResult");
+const volumeShortcuts = Array.from(document.querySelectorAll("[data-volume-shortcut]"));
 
 if (cards.length && search && volumeFilter && resultCount) {
   search.addEventListener("input", updateList);
   volumeFilter.addEventListener("change", updateList);
+
+  for (const shortcut of volumeShortcuts) {
+    shortcut.addEventListener("click", () => {
+      volumeFilter.value = shortcut.dataset.volumeShortcut || "";
+      updateList();
+    });
+  }
 }
 
 function updateList() {

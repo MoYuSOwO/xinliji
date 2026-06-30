@@ -2,7 +2,7 @@
 import "../../styles.css";
 import faviconUrl from "../../assets/favicon.svg?url";
 
-const { title = "新礼记" } = Astro.props;
+const { title = "新礼记", skipTarget = "mainContent", skipLabel = "跳至内容" } = Astro.props;
 const pageTitle = title === "新礼记" ? title : `${title} · 新礼记`;
 ---
 
@@ -15,7 +15,7 @@ const pageTitle = title === "新礼记" ? title : `${title} · 新礼记`;
     <link rel="icon" href={faviconUrl} type="image/svg+xml" />
   </head>
   <body>
-    <a class="skip-link" href="#readerPanel">跳至正文</a>
+    <a class="skip-link" href={`#${skipTarget}`}>{skipLabel}</a>
     <div class="site-shell">
       <slot />
     </div>
