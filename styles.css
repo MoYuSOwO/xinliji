@@ -322,6 +322,64 @@ h1 {
   justify-content: space-between;
 }
 
+.archive-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid rgba(95, 68, 37, 0.22);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 242, 0.72);
+  box-shadow: var(--shadow-sm);
+}
+
+.archive-note h2 {
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1.25;
+}
+
+.archive-note p:not(.eyebrow) {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+.note-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  color: var(--indigo);
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid rgba(38, 63, 92, 0.28);
+  border-radius: 999px;
+  background: rgba(239, 244, 246, 0.66);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.note-link svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.note-link:hover,
+.note-link:focus-visible {
+  color: var(--cinnabar);
+  border-color: rgba(159, 47, 34, 0.5);
+  background: rgba(255, 250, 240, 0.96);
+}
+
 .section-heading h2 {
   margin-top: 3px;
   color: var(--ink);
@@ -868,6 +926,15 @@ h1 {
     border-left: 0;
   }
 
+  .archive-note {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .note-link {
+    width: fit-content;
+  }
+
   .volume-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -951,6 +1018,14 @@ h1 {
   .section-heading {
     display: grid;
     align-items: start;
+  }
+
+  .archive-note {
+    padding: 16px;
+  }
+
+  .note-link {
+    width: 100%;
   }
 
   .section-heading h2 {

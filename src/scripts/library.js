@@ -2,8 +2,8 @@ const cards = Array.from(document.querySelectorAll("[data-article-card]"));
 const search = document.querySelector("#searchInput");
 const volumeFilter = document.querySelector("#volumeFilter");
 const resultCount = document.querySelector("#resultCount");
-const emptyResult = document.querySelector("#emptyResult");
 const volumeShortcuts = Array.from(document.querySelectorAll("[data-volume-shortcut]"));
+let emptyResult = null;
 
 if (cards.length && search && volumeFilter && resultCount) {
   search.addEventListener("input", updateList);
@@ -32,5 +32,21 @@ function updateList() {
   }
 
   resultCount.textContent = `${visibleCount} / ${cards.length} 篇`;
+  if (visibleCount === 0) ensureEmptyResult();
   if (emptyResult) emptyResult.hidden = visibleCount !== 0;
+}
+
+function ensureEmptyResult() {
+  if (emptyResult) return;
+
+  const articleList = document.querySelector("#articleList");
+  if (!articleList) return;
+
+  emptyResult = document.createElement("p");
+  emptyResult.id = "emptyResult";
+  emptyResult.className = "empty-result";
+  emptyResult.role = "status";
+  emptyResult.hidden = true;
+  emptyResult.textContent = "未检得相合篇目";
+  articleList.prepend(emptyResult);
 }

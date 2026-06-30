@@ -29,7 +29,7 @@ export async function getStaticPaths() {
 const { article, index, previous, next, articles } = Astro.props;
 const { Content } = await render(article);
 const volumes = getVolumes().filter((volume) => articles.some((item) => item.data.volumeId === volume.id));
-const volumeTotal = getVolumes().filter((volume) => volume.id > 0).length;
+const volumeTotal = getVolumes().length;
 const charCount = countCjkLikeChars(article.body || "");
 ---
 

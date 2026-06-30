@@ -7,7 +7,7 @@ import { articleUrl, getSortedArticles, getVolumes, volumeName } from "../lib/ar
 const articles = await getSortedArticles();
 const allVolumes = getVolumes();
 const volumes = allVolumes.filter((volume) => articles.some((article) => article.data.volumeId === volume.id));
-const volumeTotal = allVolumes.filter((volume) => volume.id > 0).length;
+const volumeTotal = allVolumes.length;
 const introArticle = articles.find((article) => article.data.volumeId === 0) || articles[0];
 const recentArticles = [...articles]
   .sort((a, b) => String(b.data.date || "").localeCompare(String(a.data.date || "")) || a.data.title.localeCompare(b.data.title, "zh-Hans"))
@@ -63,6 +63,20 @@ const volumeItems = allVolumes.map((volume) => {
           }
         </div>
       </aside>
+    </section>
+
+    <section class="archive-note" aria-labelledby="archiveNoteTitle">
+      <div>
+        <p class="eyebrow">凡例</p>
+        <h2 id="archiveNoteTitle">入藏说明</h2>
+      </div>
+      <p>本站无后台，诸篇皆藏于 GitHub。若有增删校勘，构建刊行，可至原库提 PR。</p>
+      <a class="note-link" href="https://github.com/MoYuSOwO/xinliji" target="_blank" rel="noreferrer" aria-label="打开 GitHub 仓库 MoYuSOwO/xinliji">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M12 .5a12 12 0 0 0-3.8 23.38c.6.11.82-.26.82-.58v-2.04c-3.34.73-4.04-1.6-4.04-1.6-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.08 1.83 2.82 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.66-.31-5.46-1.34-5.46-5.94 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.53.12-3.18 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.62-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.23v3.29c0 .32.21.7.83.58A12 12 0 0 0 12 .5Z"></path>
+        </svg>
+        原库提 PR
+      </a>
     </section>
 
     <section class="volume-section" aria-labelledby="volumeTitle">
