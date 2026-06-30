@@ -19,8 +19,7 @@ function main() {
     .readdirSync(articlesDir, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
     .map((entry) => articleFromFile(entry.name, volumes))
-    .sort(compareArticles)
-    .map(({ order, ...article }) => article);
+    .sort(compareArticles);
 
   const output = `${JSON.stringify(articles, null, 2)}\n`;
 
@@ -52,14 +51,12 @@ function articleFromFile(file, volumes) {
   const volumeId = normalizeVolumeId(frontMatter.volumeId, file, volumes);
 
   return omitEmpty({
-    order: frontMatter.order ?? Number.MAX_SAFE_INTEGER,
     slug,
     file,
     title: frontMatter.title,
     volumeId,
     date: frontMatter.date,
-    source: frontMatter.source,
-    sourceUrl: frontMatter.sourceUrl,
+    author: frontMatter.author,
   });
 }
 
@@ -103,8 +100,8 @@ function stripQuotes(value) {
 
 function normalizeVolumeId(volumeId, file, volumes) {
   if (volumeId == null) return undefined;
-  const normalized = String(volumeId);
-  if (!volumes.some((item) => item.id === normalized)) {
+  const normalized = Number(volumeId);
+  if (!Number.isInteger(normalized) || !volumes.some((item) => item.id === normalized)) {
     throw new Error(`${file}: unknown volume id: ${volumeId}`);
   }
   return normalized;
@@ -115,20 +112,30 @@ function validateVolumes(volumes) {
 
   const seen = new Set();
   for (const volume of volumes) {
-    if (!volume.id || !volume.name) throw new Error("Each volume must include id and name");
+    if (volume.id == null || !volume.name) throw new Error("Each volume must include id and name");
+    if (!Number.isInteger(volume.id)) throw new Error(`Volume id must be an integer: ${volume.id}`);
     if (seen.has(volume.id)) throw new Error(`Duplicate volume id: ${volume.id}`);
     seen.add(volume.id);
   }
 }
 
 function compareArticles(a, b) {
-  if (a.order !== b.order) return a.order - b.order;
-  return String(b.date || "").localeCompare(String(a.date || "")) || a.title.localeCompare(b.title);
+  const volumeCompare = volumeSortValue(a) - volumeSortValue(b);
+  if (volumeCompare) return volumeCompare;
+
+  const dateCompare = String(b.date || "").localeCompare(String(a.date || ""));
+  if (dateCompare) return dateCompare;
+
+  return a.title.localeCompare(b.title, "zh-Hans") || a.file.localeCompare(b.file, "zh-Hans");
 }
 
-function omitEmpty(source) {
+function volumeSortValue(article) {
+  return article.volumeId == null ? Number.MAX_SAFE_INTEGER : article.volumeId;
+}
+
+function omitEmpty(object) {
   return Object.fromEntries(
-    Object.entries(source).filter(([, value]) => {
+    Object.entries(object).filter(([, value]) => {
       if (Array.isArray(value)) return value.length > 0;
       return value !== undefined && value !== "";
     }),

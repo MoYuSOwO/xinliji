@@ -4,12 +4,14 @@ const state = {
   volumeById: new Map(),
   current: null,
   query: "",
+  volumeId: "",
   isReady: false,
 };
 
 const els = {
   search: document.querySelector("#searchInput"),
   list: document.querySelector("#articleList"),
+  volumeFilter: document.querySelector("#volumeFilter"),
   totalCount: document.querySelector("#totalCount"),
   volumeCount: document.querySelector("#volumeCount"),
   resultCount: document.querySelector("#resultCount"),
@@ -38,6 +40,7 @@ async function init() {
     state.volumes = await volumeRes.json();
     state.volumeById = new Map(state.volumes.map((volume) => [String(volume.id), volume]));
     bindEvents();
+    renderVolumeFilter();
     renderStats();
     renderList();
     state.isReady = true;
@@ -51,6 +54,18 @@ function bindEvents() {
   els.search.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     renderList();
+    updateArticleControls();
+  });
+
+  els.volumeFilter.addEventListener("change", (event) => {
+    state.volumeId = event.target.value;
+    const articles = filteredArticles();
+    if (articles.length && !articles.some((article) => article.slug === state.current)) {
+      selectArticle(articles[0].slug);
+      return;
+    }
+    renderList();
+    updateArticleControls();
   });
 
   els.prev.addEventListener("click", () => selectNeighbor(-1, { focusReader: true }));
@@ -64,22 +79,44 @@ function bindEvents() {
 }
 
 function renderStats() {
-  const volumes = new Set(state.articles.map((article) => article.volumeId).filter(Boolean));
+  const volumes = new Set(state.articles.map((article) => article.volumeId).filter((volumeId) => volumeId != null));
 
   els.totalCount.textContent = String(state.articles.length);
   els.volumeCount.textContent = String(volumes.size);
 }
 
+function renderVolumeFilter() {
+  const usedVolumeIds = new Set(
+    state.articles.map((article) => article.volumeId).filter((volumeId) => volumeId != null).map(String),
+  );
+  const options = [
+    optionElement("", "全部卷目"),
+    ...state.volumes
+      .filter((volume) => usedVolumeIds.has(String(volume.id)))
+      .map((volume) => optionElement(String(volume.id), volume.name)),
+  ];
+  els.volumeFilter.replaceChildren(...options);
+}
+
+function optionElement(value, label) {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  return option;
+}
+
 function filteredArticles() {
   return state.articles.filter((article) => {
+    if (state.volumeId && String(article.volumeId) !== state.volumeId) return false;
+
     const haystack = [
       article.title,
       article.volumeId,
       volumeName(article),
-      article.source,
+      article.author,
       article.date,
     ]
-      .filter(Boolean)
+      .filter((value) => value != null && value !== "")
       .join(" ")
       .toLowerCase();
     return !state.query || haystack.includes(state.query);
@@ -155,31 +192,38 @@ function updateUrlState(article, updateUrl) {
 }
 
 function updateArticleControls() {
-  const index = currentIndex();
+  const articles = visibleArticlesForNavigation();
+  const index = currentIndex(articles);
   els.prev.disabled = index <= 0;
-  els.next.disabled = index === -1 || index >= state.articles.length - 1;
-  els.random.disabled = state.articles.length < 2;
+  els.next.disabled = index === -1 || index >= articles.length - 1;
+  els.random.disabled = articles.length < 2;
 }
 
-function currentIndex() {
-  return state.articles.findIndex((article) => article.slug === state.current);
+function currentIndex(articles = state.articles) {
+  return articles.findIndex((article) => article.slug === state.current);
 }
 
 function selectNeighbor(step, options = {}) {
-  const nextIndex = currentIndex() + step;
-  const article = state.articles[nextIndex];
+  const articles = visibleArticlesForNavigation();
+  const nextIndex = currentIndex(articles) + step;
+  const article = articles[nextIndex];
   if (article) selectArticle(article.slug, options);
 }
 
 function selectRandom(options = {}) {
-  const candidates = state.articles.filter((article) => article.slug !== state.current);
+  const candidates = visibleArticlesForNavigation().filter((article) => article.slug !== state.current);
   const article = candidates[Math.floor(Math.random() * candidates.length)];
   if (article) selectArticle(article.slug, options);
 }
 
 function readerPositionText(article) {
-  const index = state.articles.findIndex((item) => item.slug === article.slug);
-  return index >= 0 ? `第 ${index + 1} / ${state.articles.length} 篇` : "";
+  const articles = visibleArticlesForNavigation();
+  const index = articles.findIndex((item) => item.slug === article.slug);
+  return index >= 0 ? `第 ${index + 1} / ${articles.length} 篇` : "";
+}
+
+function visibleArticlesForNavigation() {
+  return filteredArticles();
 }
 
 function focusReaderPanel() {
@@ -191,7 +235,7 @@ function focusReaderPanel() {
 }
 
 function cardFoot(article) {
-  return [volumeName(article) || "未分卷", sourceText(article)].filter(Boolean).join(" · ");
+  return [volumeName(article) || "未分卷", authorText(article)].filter(Boolean).join(" · ");
 }
 
 function volumeName(article) {
@@ -199,26 +243,15 @@ function volumeName(article) {
   return state.volumeById.get(String(article.volumeId))?.name || "";
 }
 
-function sourceText(article) {
-  return article.source ? `出处：${article.source}` : "";
+function authorText(article) {
+  return article.author ? `作者：${article.author}` : "";
 }
 
 function metaHtml(article) {
   const parts = [];
   if (article.date) parts.push(escapeHtml(article.date));
-  if (article.source) {
-    const source = escapeHtml(article.source);
-    if (isSafeSourceUrl(article.sourceUrl)) {
-      parts.push(`出处：<a href="${escapeHtml(article.sourceUrl)}" target="_blank" rel="noreferrer">${source}</a>`);
-    } else {
-      parts.push(`出处：${source}`);
-    }
-  }
+  if (article.author) parts.push(`作者：${escapeHtml(article.author)}`);
   return parts.join(" · ");
-}
-
-function isSafeSourceUrl(url) {
-  return typeof url === "string" && /^https?:\/\//.test(url);
 }
 
 function parseDocument(raw) {

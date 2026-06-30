@@ -55,7 +55,8 @@ body::before {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -65,6 +66,7 @@ button {
 
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
 .skip-link:focus-visible,
 .reader:focus-visible {
   outline: 3px solid var(--focus);
@@ -267,10 +269,13 @@ h1 {
 }
 
 .toolbar {
+  display: grid;
+  gap: 12px;
   margin: 14px 0 12px;
 }
 
-.search-field {
+.search-field,
+.filter-field {
   display: grid;
   gap: 8px;
 }
@@ -321,6 +326,25 @@ h1 {
 
 .search-control input::placeholder {
   color: rgba(68, 58, 47, 0.72);
+}
+
+.volume-filter {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--ink);
+  border: 1px solid rgba(95, 68, 37, 0.28);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 242, 0.76);
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.volume-filter:hover,
+.volume-filter:focus-visible {
+  border-color: var(--focus);
+  background: #fffdf6;
+  box-shadow: 0 0 0 3px rgba(31, 91, 132, 0.12);
 }
 
 .text-button {
@@ -509,6 +533,7 @@ h1 {
   color: var(--ink-soft);
   font-size: 1.18rem;
   line-height: 2;
+  overflow-wrap: break-word;
 }
 
 .article-body p {
@@ -584,7 +609,7 @@ h1 {
 
 @media (max-width: 920px) {
   .site-shell {
-    width: min(100% - 24px, 720px);
+    width: min(720px, calc(100% - 24px));
     padding-top: 12px;
   }
 
@@ -609,35 +634,46 @@ h1 {
   }
 
   .reader {
-    order: 1;
+    order: 2;
+    min-height: auto;
+    padding: 24px;
   }
 
   .library {
-    order: 2;
+    order: 1;
     position: static;
     max-height: none;
+  }
+
+  .reader h2 {
+    font-size: 2.45rem;
+  }
+
+  .article-body {
+    font-size: 1.12rem;
+    line-height: 1.92;
   }
 }
 
 @media (max-width: 560px) {
   .site-shell {
-    width: min(100% - 20px, 560px);
+    width: min(560px, calc(100% - 20px));
   }
 
   .masthead {
-    gap: 14px;
+    gap: 12px;
     min-height: 0;
-    padding: 20px 16px;
+    padding: 18px 14px;
   }
 
   .seal {
-    width: 58px;
-    height: 58px;
-    font-size: 32px;
+    width: 54px;
+    height: 54px;
+    font-size: 30px;
   }
 
   h1 {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
   }
 
   .lede {
@@ -675,6 +711,48 @@ h1 {
   .reader-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .text-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .masthead {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 10px;
+    padding: 16px 12px;
+  }
+
+  .masthead::before {
+    inset: 10px;
+  }
+
+  .masthead::after {
+    inset: 16px;
+  }
+
+  .seal {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+  }
+
+  .kicker {
+    font-size: 0.82rem;
+  }
+
+  h1 {
+    font-size: 2.35rem;
+  }
+
+  .lede {
+    font-size: 0.92rem;
+  }
+
+  .collection-stats div {
+    min-width: 0;
   }
 }
 

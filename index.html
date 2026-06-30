@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>新周礼记</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -39,28 +40,34 @@
           </div>
 
           <div class="toolbar">
+            <label class="filter-field" for="volumeFilter">
+              <span class="field-label">按卷筛选</span>
+              <select id="volumeFilter" class="volume-filter">
+                <option value="">全部卷目</option>
+              </select>
+            </label>
             <label class="search-field" for="searchInput">
               <span class="field-label">检索篇目</span>
               <span class="search-control">
                 <svg aria-hidden="true" viewBox="0 0 24 24">
                   <path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
                 </svg>
-                <input id="searchInput" type="search" placeholder="篇名、出处、卷名" autocomplete="off" />
+                <input id="searchInput" type="search" placeholder="篇名、作者、卷名" autocomplete="off" />
               </span>
             </label>
           </div>
           <div id="articleList" class="article-list"></div>
         </aside>
 
-        <article id="readerPanel" class="reader" aria-live="polite" tabindex="-1">
+        <article id="readerPanel" class="reader" tabindex="-1">
           <div class="reader-inner">
             <div class="reader-top">
               <div>
                 <p id="articleVolume" class="volume"></p>
-                <p id="readerCount" class="reader-count"></p>
+                <p id="readerCount" class="reader-count" aria-live="polite"></p>
               </div>
             </div>
-            <h2 id="articleTitle"></h2>
+            <h2 id="articleTitle" aria-live="polite"></h2>
             <div id="articleMeta" class="meta-line"></div>
             <div class="reader-actions" aria-label="篇目翻阅">
               <button id="prevArticle" class="text-button" type="button">上一篇</button>
