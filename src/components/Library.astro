@@ -1,0 +1,52 @@
+---
+import { articleUrl, volumeName } from "../lib/articles";
+
+const { articles, volumes, currentSlug = "", interactive = false } = Astro.props;
+---
+
+<aside class="library" aria-labelledby="libraryTitle">
+  <div class="library-head">
+    <div>
+      <p class="eyebrow">目录</p>
+      <h2 id="libraryTitle">诸篇</h2>
+    </div>
+    <p id="resultCount" class="result-count">{articles.length} / {articles.length} 篇</p>
+  </div>
+
+  <div class="toolbar">
+    <label class="filter-field" for="volumeFilter">
+      <span class="field-label">按卷筛选</span>
+      <select id="volumeFilter" class="volume-filter" disabled={!interactive}>
+        <option value="">全部卷目</option>
+        {volumes.map((volume) => <option value={String(volume.id)}>{volume.name}</option>)}
+      </select>
+    </label>
+    <label class="search-field" for="searchInput">
+      <span class="field-label">检索篇目</span>
+      <span class="search-control">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"></path>
+        </svg>
+        <input id="searchInput" type="search" placeholder="篇名、作者、卷名" autocomplete="off" disabled={!interactive} />
+      </span>
+    </label>
+  </div>
+  <div id="articleList" class="article-list">
+    {
+      articles.map((article) => (
+        <a
+          class:list={["article-card", { "is-selected": article.id === currentSlug }]}
+          href={articleUrl(article)}
+          data-article-card={interactive ? "true" : undefined}
+          data-slug={article.id}
+          aria-current={article.id === currentSlug ? "true" : "false"}
+        >
+          <span class="card-title">{article.data.title}</span>
+          <span class="card-foot">
+            {[volumeName(article) || "未分卷", article.data.author ? `作者：${article.data.author}` : ""].filter(Boolean).join(" · ")}
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</aside>

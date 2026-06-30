@@ -1,0 +1,23 @@
+---
+import "../../styles.css";
+import faviconUrl from "../../assets/favicon.svg?url";
+
+const { title = "新礼记" } = Astro.props;
+const pageTitle = title === "新礼记" ? title : `${title} · 新礼记`;
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <link rel="icon" href={faviconUrl} type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#readerPanel">跳至正文</a>
+    <div class="site-shell">
+      <slot />
+    </div>
+  </body>
+</html>

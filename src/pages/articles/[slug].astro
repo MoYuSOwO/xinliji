@@ -1,0 +1,76 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Library from "../../components/Library.astro";
+import Masthead from "../../components/Masthead.astro";
+import {
+  articleUrl,
+  countCjkLikeChars,
+  getSortedArticles,
+  getVolumes,
+  readerPositionText,
+  volumeName,
+} from "../../lib/articles";
+
+export async function getStaticPaths() {
+  const articles = await getSortedArticles();
+  return articles.map((article, index) => ({
+    params: { slug: article.id },
+    props: {
+      article,
+      index,
+      previous: articles[index - 1],
+      next: articles[index + 1],
+      articles,
+    },
+  }));
+}
+
+const { article, index, previous, next, articles } = Astro.props;
+const { Content } = await render(article);
+const volumes = getVolumes().filter((volume) => articles.some((item) => item.data.volumeId === volume.id));
+const charCount = countCjkLikeChars(article.body || "");
+---
+
+<BaseLayout title={article.data.title}>
+  <Masthead totalCount={articles.length} volumeCount={volumes.length} />
+
+  <main id="mainContent" class="layout article-layout">
+    <Library articles={articles} volumes={volumes} currentSlug={article.id} interactive={false} />
+
+    <article id="readerPanel" class="reader" tabindex="-1">
+      <div class="reader-inner">
+        <div class="reader-top">
+          <div>
+            <p class="volume">{volumeName(article)}</p>
+            <p class="reader-count">{readerPositionText(index, articles.length)} · {charCount}字</p>
+          </div>
+        </div>
+        <h2>{article.data.title}</h2>
+        <div class="meta-line">
+          {[article.data.date, article.data.author ? `作者：${article.data.author}` : ""].filter(Boolean).join(" · ")}
+        </div>
+        <nav class="reader-actions" aria-label="篇目翻阅">
+          {
+            previous ? (
+              <a class="text-button" href={articleUrl(previous)}>上一篇</a>
+            ) : (
+              <span class="text-button is-disabled" aria-disabled="true">上一篇</span>
+            )
+          }
+          <a class="text-button text-button-primary" href="/">回目录</a>
+          {
+            next ? (
+              <a class="text-button" href={articleUrl(next)}>下一篇</a>
+            ) : (
+              <span class="text-button is-disabled" aria-disabled="true">下一篇</span>
+            )
+          }
+        </nav>
+        <div class="article-body">
+          <Content />
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

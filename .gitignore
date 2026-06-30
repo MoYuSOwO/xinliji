@@ -1,2 +1,5 @@
 .DS_Store
 generated/articles.json
+node_modules/
+dist/
+.astro/

@@ -1,0 +1,24 @@
+---
+import sealUrl from "../../assets/favicon.svg?url";
+
+const { totalCount, volumeCount } = Astro.props;
+---
+
+<header class="masthead" aria-label="新礼记">
+  <img class="seal" src={sealUrl} alt="" aria-hidden="true" />
+  <div class="masthead-copy">
+    <p class="kicker">今事古书 · 旧辞新梗</p>
+    <h1>新礼记</h1>
+    <p class="lede">以古人之笔，录今日之怪与趣。</p>
+  </div>
+  <dl class="collection-stats" aria-label="册子统计">
+    <div>
+      <dt>篇</dt>
+      <dd>{totalCount}</dd>
+    </div>
+    <div>
+      <dt>卷</dt>
+      <dd>{volumeCount}</dd>
+    </div>
+  </dl>
+</header>

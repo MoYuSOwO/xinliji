@@ -1,0 +1,84 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Library from "../components/Library.astro";
+import Masthead from "../components/Masthead.astro";
+import {
+  articleUrl,
+  countCjkLikeChars,
+  getSortedArticles,
+  getVolumes,
+  readerPositionText,
+  volumeName,
+} from "../lib/articles";
+import { safeJson } from "../lib/json";
+
+const articles = await getSortedArticles();
+const volumes = getVolumes().filter((volume) => articles.some((article) => article.data.volumeId === volume.id));
+const renderedArticles = await Promise.all(
+  articles.map(async (article, index) => {
+    const { Content } = await render(article);
+    const charCount = countCjkLikeChars(article.body || "");
+    return { article, index, Content, charCount };
+  }),
+);
+const first = renderedArticles[0];
+const articleData = renderedArticles.map(({ article, index, charCount }) => ({
+  slug: article.id,
+  title: article.data.title,
+  volumeId: article.data.volumeId,
+  volumeName: volumeName(article),
+  date: article.data.date,
+  author: article.data.author || "",
+  url: articleUrl(article),
+  position: readerPositionText(index, articles.length),
+  charCount,
+}));
+---
+
+<BaseLayout title="新礼记">
+  <Masthead totalCount={articles.length} volumeCount={volumes.length} />
+
+  <main id="mainContent" class="layout">
+    <Library articles={articles} volumes={volumes} currentSlug={first.article.id} interactive={true} />
+
+    <article id="readerPanel" class="reader" tabindex="-1">
+      <div class="reader-inner">
+        <div class="reader-top">
+          <div>
+            <p id="articleVolume" class="volume">{volumeName(first.article)}</p>
+            <p id="readerCount" class="reader-count" aria-live="polite">
+              {readerPositionText(first.index, articles.length)} · {first.charCount}字
+            </p>
+          </div>
+        </div>
+        <h2 id="articleTitle" aria-live="polite">{first.article.data.title}</h2>
+        <div id="articleMeta" class="meta-line">
+          {[first.article.data.date, first.article.data.author ? `作者：${first.article.data.author}` : ""].filter(Boolean).join(" · ")}
+        </div>
+        <div class="reader-actions" aria-label="篇目翻阅">
+          <button id="prevArticle" class="text-button" type="button" disabled>上一篇</button>
+          <button id="randomArticle" class="text-button text-button-primary" type="button">随便翻</button>
+          <button id="nextArticle" class="text-button" type="button">下一篇</button>
+        </div>
+        <div id="articleBody" class="article-body">
+          <first.Content />
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <div class="article-templates" hidden>
+    {
+      renderedArticles.map(({ article, Content }) => (
+        <template id={`article-template-${article.id}`}>
+          <Content />
+        </template>
+      ))
+    }
+  </div>
+  <script id="articleData" type="application/json" set:html={safeJson(articleData)} />
+  <script>
+    import "../scripts/home.js";
+  </script>
+</BaseLayout>

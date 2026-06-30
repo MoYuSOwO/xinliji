@@ -361,11 +361,13 @@ h1 {
 
 .article-card {
   position: relative;
+  display: block;
   width: 100%;
   min-height: 88px;
   padding: 14px 14px 14px 18px;
   color: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   border: 1px solid rgba(95, 68, 37, 0.18);
   border-radius: var(--radius);
@@ -490,8 +492,12 @@ h1 {
 }
 
 .text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 14px;
   color: var(--indigo);
+  text-decoration: none;
   border: 1px solid rgba(38, 63, 92, 0.28);
   background: rgba(239, 244, 246, 0.66);
 }
@@ -514,7 +520,8 @@ h1 {
   background: var(--cinnabar-dark);
 }
 
-.text-button:disabled {
+.text-button:disabled,
+.text-button.is-disabled {
   color: rgba(68, 58, 47, 0.48);
   cursor: not-allowed;
   border-color: rgba(95, 68, 37, 0.15);
@@ -637,6 +644,14 @@ h1 {
     order: 1;
     position: static;
     max-height: none;
+  }
+
+  .article-layout .reader {
+    order: 1;
+  }
+
+  .article-layout .library {
+    order: 2;
   }
 
   .reader h2 {
